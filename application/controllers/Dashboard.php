@@ -1223,6 +1223,489 @@ class Dashboard extends CI_Controller {
       $this->session->set_flashdata('Success', 'Import Successfully');
       redirect('Dashboard/ImportExport');
   }
+
+  public function importEmi(){
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 36; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+           
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+
+       // insert import data
+       foreach($importData_arr as $userdata){
+       
+          // Skip first row
+          if($skip != 0){
+           
+            $data = array(
+                "member_id" => isset($userdata[1]) ? $userdata[1] : '',
+                "plan_id" => isset($userdata[2]) ? $userdata[2]: '',
+                "group_id" => isset($userdata[3]) ? $userdata[3] : '',
+                "plan_emi" => isset($userdata[4]) ? $userdata[4] : '',
+                "emi_no" => isset($userdata[5]) ? $userdata[5] : '',
+                "total_emi" => isset($userdata[6]) ? $userdata[6] : '',
+                "emi_status" => isset($userdata[7]) ? $userdata[7] : '',
+                "divident" => isset($userdata[8]) ? $userdata[8] : '',
+                "slot_number" => isset($userdata[9]) ? $userdata[9] : '',
+                "gst_percentage" => isset($userdata[10]) ? $userdata[10] : '',
+                "plan_emi_after_gst" => isset($userdata[11]) ? $userdata[11] : '',
+                "is_gst_included" => isset($userdata[12]) ? $userdata[12] : '',
+                "gst_amount" => isset($userdata[13]) ? $userdata[13] : '',
+                "is_chit_taken" => isset($userdata[14]) ? $userdata[14] : '',
+                "chit_amount" => isset($userdata[15]) ? $userdata[15] : '',
+                "chit_emi_months" => isset($userdata[16]) ? $userdata[16] : '',
+                "chit_emi" => isset($userdata[17]) ? $userdata[17] : '',
+                "return_chit_amount" => isset($userdata[18]) ? $userdata[18] : '',
+                "return_factor" => isset($userdata[19]) ? $userdata[19] : '',
+                "chit_interest" => isset($userdata[20]) ? $userdata[20] : '',
+                "return_chit_amount_final" => isset($userdata[21]) ? $userdata[21] : '',
+                "chit_status" => isset($userdata[22]) ? $userdata[22] : '',
+                "revised_emi" => isset($userdata[23]) ? $userdata[23] : '',
+                "is_emi_due" => isset($userdata[24]) ? $userdata[24] : '',
+                "penality_amount" => isset($userdata[25]) ? $userdata[25] : '',
+                "rate_of_interest" => isset($userdata[26]) ? $userdata[26] : '',
+                "after_penality_amount" => isset($userdata[27]) ? $userdata[27] : '',
+                "revised_emi_after_penality" => isset($userdata[28]) ? $userdata[28] : '',
+                "is_partial_payment" => isset($userdata[29]) ? $userdata[29] : '',
+                "partial_paid_amount" => isset($userdata[30]) ? $userdata[30] : '',
+                "amount_due" => isset($userdata[31]) ? $userdata[31] : '',
+                "emi_month" => isset($userdata[32]) ? $userdata[32] : '',
+                "mode" => isset($userdata[33]) ? $userdata[33] : '',
+                "added_date" => isset($userdata[34]) ? $userdata[34] : '',
+                "update_date" => isset($userdata[35]) ? $userdata[35] : '',                
+               );  
+               $this->db->insert('tbl_emi',$data);
+               $all_data[] = $data;
+               
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
+
+
+public function importBids(){
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 20; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+           
+          
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+       
+       // insert import data
+       foreach($importData_arr as $userdata){
+       
+          // Skip first row
+          if($skip != 0){
+           
+            $data = array(
+                "plan_id" => isset($userdata[1]) ? $userdata[1] : '',
+                "auction_id" => isset($userdata[2]) ? $userdata[2]: '',
+                "member_id" => isset($userdata[3]) ? $userdata[3] : '',
+                "group_id" => isset($userdata[4]) ? $userdata[4] : '',
+                "agent_id" => isset($userdata[5]) ? $userdata[5] : '',
+                "plan_name" => isset($userdata[6]) ? $userdata[6] : '',
+                "member_name" => isset($userdata[7]) ? $userdata[7] : '',
+                "bid_amount" => isset($userdata[8]) ? $userdata[8] : '',
+                "forgo_amount" => isset($userdata[9]) ? $userdata[9] : '',
+                "divident" => isset($userdata[10]) ? $userdata[10] : '',
+                "cost_of_chit_taken" => isset($userdata[11]) ? $userdata[11] : '',
+                "risk_factor" => isset($userdata[12]) ? $userdata[12] : '',
+                "slot_number" => isset($userdata[13]) ? $userdata[13] : '',
+                "is_bid_accepted" => isset($userdata[14]) ? $userdata[14] : '',
+                "is_added_by_agent" => isset($userdata[15]) ? $userdata[15] : '',
+                "added_date" => isset($userdata[16]) ? $userdata[16] : '',
+                "update_date" => isset($userdata[17]) ? $userdata[17] : '',
+                "added_by" => isset($userdata[18]) ? $userdata[18] : '',
+                "update_by" => isset($userdata[19]) ? $userdata[19] : '',                              
+               );  
+               $this->db->insert('tbl_bids',$data);
+               $all_data[] = $data;
+               
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
+
+public function importDivident(){
+
+    
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 11; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+           
+          
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+       
+       // insert import data
+       foreach($importData_arr as $userdata){
+       
+          // Skip first row
+          if($skip != 0){
+           
+            $data = array(
+                "member_name" => isset($userdata[1]) ? $userdata[1] : '',
+                "member_id" => isset($userdata[2]) ? $userdata[2]: '',
+                "plan_id" => isset($userdata[3]) ? $userdata[3] : '',
+                "group_id" => isset($userdata[4]) ? $userdata[4] : '',
+                "auction_id" => isset($userdata[5]) ? $userdata[5] : '',
+                "divident_amount" => isset($userdata[6]) ? $userdata[6] : '',
+                "month" => isset($userdata[7]) ? $userdata[7] : '',
+                "total_months" => isset($userdata[8]) ? $userdata[8] : '',
+                "added_date" => isset($userdata[9]) ? $userdata[9] : '',
+                "update_date" => isset($userdata[10]) ? $userdata[10] : '',                
+               );  
+            //    print_r($data);die;
+               $this->db->insert('tbl_divident',$data);
+               $all_data[] = $data;
+               
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
+
+public function importChits(){
+
+    
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 29; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+          
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+       
+       // insert import data
+       foreach($importData_arr as $userdata){
+       
+          // Skip first row
+          if($skip != 0){
+           
+            $data = array(
+                "member_id" => isset($userdata[1]) ? $userdata[1] : '',
+                "plan_id" => isset($userdata[2]) ? $userdata[2]: '',
+                "auction_id" => isset($userdata[3]) ? $userdata[3] : '',
+                "group_id" => isset($userdata[4]) ? $userdata[4] : '',
+                "return_chit_amount" => isset($userdata[5]) ? $userdata[5] : '',
+                "total_amount_paid" => isset($userdata[6]) ? $userdata[6] : '',
+                "total_amount_due" => isset($userdata[7]) ? $userdata[7] : '',
+                "chit_amount" => isset($userdata[8]) ? $userdata[8] : '',
+                "forgo_amount" => isset($userdata[9]) ? $userdata[9] : '',
+                "is_payment_by_cheque" => isset($userdata[10]) ? $userdata[10] : '',
+                "cheque_no" => isset($userdata[11]) ? $userdata[11] : '',
+                "bank_account" => isset($userdata[12]) ? $userdata[12] : '',
+                "is_hand_over" => isset($userdata[13]) ? $userdata[13] : '',
+                "is_on_EMI" => isset($userdata[14]) ? $userdata[14] : '',
+                "emi_amount" => isset($userdata[15]) ? $userdata[15] : '',
+                "payment_proof" => isset($userdata[16]) ? $userdata[16] : '',
+                "payment_mode" => isset($userdata[17]) ? $userdata[17] : '',
+                "handover_amount_after_chearing_dues" => isset($userdata[18]) ? $userdata[18] : '',
+                "total_emi" => isset($userdata[19]) ? $userdata[19] : '',
+                "due_emi" => isset($userdata[20]) ? $userdata[20] : '',
+                "emi_paid" => isset($userdata[21]) ? $userdata[21] : '',
+                "amount_due" => isset($userdata[22]) ? $userdata[22] : '',
+                "previous_auction_due" => isset($userdata[23]) ? $userdata[23] : '',
+                "is_active" => isset($userdata[24]) ? $userdata[24] : '',
+                "slot_number" => isset($userdata[25]) ? $userdata[25] : '',
+                "chit_month" => isset($userdata[26]) ? $userdata[26] : '',
+                "added_date" => isset($userdata[27]) ? $userdata[27] : '',
+                "update_date" => isset($userdata[28]) ? $userdata[28] : '',                
+               );  
+
+               $check = $this->db->where('plan_id',$userdata[2])->where('slot_number',$userdata[25])->get('tbl_chits')->num_rows();
+               if($check == 0){
+                    $this->db->insert('tbl_chits',$data);
+               }
+               
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
+
+public function importTransaction(){
+
+    
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 40; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+       
+       // insert import data
+       foreach($importData_arr as $userdata){
+       
+          // Skip first row
+          if($skip != 0){
+           
+            $data = array(
+                "transaction_type" => isset($userdata[1]) ? $userdata[1] : '',
+                "transaction_for" => isset($userdata[2]) ? $userdata[2]: '',
+                "subscriber_id" => isset($userdata[3]) ? $userdata[3] : '',
+                "service_provider_id" => isset($userdata[4]) ? $userdata[4] : '',
+                "transaction_amount" => isset($userdata[5]) ? $userdata[5] : '',
+                "emi_count" => isset($userdata[6]) ? $userdata[6] : '',
+                "emi_type" => isset($userdata[7]) ? $userdata[7] : '',
+                "emi_ids" => isset($userdata[8]) ? $userdata[8] : '',
+                "plan_id" => isset($userdata[9]) ? $userdata[9] : '',
+                "plan_name" => isset($userdata[10]) ? $userdata[10] : '',
+                "payment_mode" => isset($userdata[11]) ? $userdata[11] : '',
+                "bank_account_id" => isset($userdata[12]) ? $userdata[12] : '',
+                "is_payment_by_cheque" => isset($userdata[13]) ? $userdata[13] : '',
+                "cheque_number" => isset($userdata[14]) ? $userdata[14] : '',
+                "payment_proof" => isset($userdata[15]) ? $userdata[15] : '',
+                "is_payment_by_agent" => isset($userdata[16]) ? $userdata[16] : '',
+                "agent_id" => isset($userdata[17]) ? $userdata[17] : '',
+                "received_by" => isset($userdata[18]) ? $userdata[18] : '',
+                "paid_by" => isset($userdata[19]) ? $userdata[19] : '',
+                "transaction_month" => isset($userdata[20]) ? $userdata[20] : '',
+                "is_payment_by_cash" => isset($userdata[21]) ? $userdata[21] : '',
+                "transaction_amount_after_gst" => isset($userdata[22]) ? $userdata[22] : '',
+                "gst_amount" => isset($userdata[23]) ? $userdata[23] : '',
+                "is_gst_included" => isset($userdata[24]) ? $userdata[24] : '',
+                "gst_percentage" => isset($userdata[25]) ? $userdata[25] : '',
+                "tax_type" => isset($userdata[26]) ? $userdata[26] : '',
+                "ten" => isset($userdata[27]) ? $userdata[27] : '',
+                "tewenty" => isset($userdata[28]) ? $userdata[28] : '',
+                "fifty" => isset($userdata[29]) ? $userdata[29] : '',
+                "hundred" => isset($userdata[30]) ? $userdata[30] : '',
+                "two_hundred" => isset($userdata[31]) ? $userdata[31] : '',
+                "five_hundred" => isset($userdata[32]) ? $userdata[32] : '',
+                "two_thousand" => isset($userdata[33]) ? $userdata[33] : '',
+                "opening_balance" => isset($userdata[34]) ? $userdata[34] : '',
+                "current_balance" => isset($userdata[35]) ? $userdata[35] : '',
+                "type" => isset($userdata[36]) ? $userdata[36] : '',
+                "status" => isset($userdata[37]) ? $userdata[37] : '',
+                "added_date" => isset($userdata[38]) ? $userdata[38] : '',
+                "updated_date" => isset($userdata[39]) ? $userdata[39] : '',                                
+               );  
+               
+               $this->SubmitGeneralLedgerMaster($data);
+               $this->db->insert('tbl_transactions',$data);
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
   
     public function exportSubscriber(){
       $file_name = 'Subscriber'.date('Ymd').'.csv'; 
@@ -1350,7 +1833,10 @@ class Dashboard extends CI_Controller {
             $skip = 0;
 
             // insert import data
-            foreach($importData_arr as $userdata){               
+            foreach($importData_arr as $userdata){
+                
+               // echo '<pre>'; print_r($userdata); die;
+               // Skip first row
                if($skip != 0){
                 $mobile = isset($userdata[5]) ? $userdata[5] : '';
                 if($this->checkAlreadyMobile($mobile)){
@@ -1559,6 +2045,130 @@ class Dashboard extends CI_Controller {
         fclose($file); 
         exit; 
     }
+
+    public function exportEmi(){
+        $file_name = 'Emi'.date('Ymd').'.csv'; 
+        header("Content-Description: File Transfer"); 
+        header("Content-Disposition: attachment; filename=$file_name"); 
+        header("Content-Type: application/csv;");
+        // get data 
+        $data = $this->db->select('emi_id,member_id,plan_id,group_id,plan_emi,emi_no,total_emi,emi_status,divident,slot_number,gst_percentage,plan_emi_after_gst,is_gst_included,gst_amount
+        ,is_chit_taken,chit_amount,chit_emi_months,chit_emi,return_chit_amount,return_factor,chit_interest,return_chit_amount_final,chit_status,revised_emi,is_emi_due,penality_amount,
+        rate_of_interest,after_penality_amount,revised_emi_after_penality,is_partial_payment,partial_paid_amount,amount_due,emi_month,mode,added_date,update_date')
+        ->get('tbl_emi')->result_array();
+        // file creation 
+       $file = fopen('php://output', 'w');
+       $header =array();
+       $header = array(
+            "emi_id",
+            "member_id",
+            "plan_id",
+            "group_id",
+            "plan_emi",
+            "emi_no",
+            "total_emi",
+            "emi_status",
+            "divident",
+            "slot_number",
+            "gst_percentage",
+            "plan_emi_after_gst",
+            "is_gst_included",
+            "gst_amount",
+            "is_chit_taken",
+            "chit_amount",
+            "chit_emi_months",
+            "chit_emi",
+            "return_chit_amount",
+            "return_factor",
+            "chit_interest",
+            "return_chit_amount_final",
+            "chit_status",
+            "revised_emi",
+            "is_emi_due","penality_amount","rate_of_interest","after_penality_amount","revised_emi_after_penality","is_partial_payment","partial_paid_amount","amount_due","emi_month","mode","added_date","update_date"
+       );
+       fputcsv($file,$header);
+       foreach($data as $userdata){
+       fputcsv($file,$userdata);
+       }
+       fclose($file); 
+       exit; 
+   }
+
+
+   public function exportBids(){
+    $file_name = 'Bids'.date('Ymd').'.csv'; 
+    header("Content-Description: File Transfer"); 
+    header("Content-Disposition: attachment; filename=$file_name"); 
+    header("Content-Type: application/csv;");
+    // get data 
+    $data = $this->db->select('bid_id,plan_id,auction_id,member_id,group_id,agent_id,plan_name,member_name,bid_amount,forgo_amount,divident,cost_of_chit_taken,risk_factor,slot_number
+    ,is_bid_accepted,is_added_by_agent,added_date,update_date,added_by,update_by')
+    ->get('tbl_bids')->result_array();
+    // file creation 
+   $file = fopen('php://output', 'w');
+   $header =array();
+   $header = array(
+        "bid_id",
+        "plan_id",
+        "auction_id",
+        "member_id",
+        "group_id",
+        "agent_id",
+        "plan_name",
+        "member_name",
+        "bid_amount",
+        "forgo_amount",
+        "divident",
+        "cost_of_chit_taken",
+        "risk_factor",
+        "slot_number",
+        "is_bid_accepted",
+        "is_added_by_agent",
+        "added_date",
+        "update_date",
+        "added_by",
+        "update_by",       
+   );
+   fputcsv($file,$header);
+   foreach($data as $userdata){
+   fputcsv($file,$userdata);
+   }
+   fclose($file); 
+   exit; 
+}
+
+
+public function exportDivident(){
+    $file_name = 'Divident'.date('Ymd').'.csv'; 
+    header("Content-Description: File Transfer"); 
+    header("Content-Disposition: attachment; filename=$file_name"); 
+    header("Content-Type: application/csv;");
+    // get data 
+    $data = $this->db->select('divident_id,member_name,member_id,plan_id,group_id,auction_id,divident_amount,month,total_months,added_date,update_date')
+    ->get('tbl_divident')->result_array();
+    // file creation 
+   $file = fopen('php://output', 'w');
+   $header =array();
+   $header = array(
+        "divident_id",
+        "member_name",
+        "member_id",
+        "plan_id",
+        "group_id",
+        "auction_id",
+        "divident_amount",
+        "month",
+        "total_months",
+        "added_date",
+        "update_date",        
+   );
+   fputcsv($file,$header);
+   foreach($data as $userdata){
+   fputcsv($file,$userdata);
+   }
+   fclose($file); 
+   exit; 
+}
     
     public function importOrder(){
      // Check form submit or not 
@@ -1945,7 +2555,6 @@ class Dashboard extends CI_Controller {
                'year' => isset($year) ? $year :'', 
             );
             $res = json_decode(callAPI('POST','getAlltranscation'),true);
-            // print_r($res['data']);die;
             $this->load->view('transcation-listing',array('data'=>$res['data'],'date_time'=>$data));
          }
      }
@@ -3096,6 +3705,110 @@ class Dashboard extends CI_Controller {
         $data = $this->db->where('member_id',$id)->get('tbl_members')->row_array();
         echo json_encode($data);
     }
+
+    public function SubmitGeneralLedgerMaster($submit_data){
+	    $check_insert_id = $this->db->select('insert_id')->ORDER_BY('general_ledger_master_id','DESC')->get('tbl_general_ledger_master')->row_array();
+            if(!empty($check_insert_id['insert_id'])){
+                $insert_id =$check_insert_id['insert_id'] + 1;
+            }else{
+                $insert_id = 1;
+            }
+                 if($submit_data['payment_mode'] =='cash'){
+                    $account_description ='CASH';
+                }else{
+                     $account_description = 'BANK';
+                }
+            if($submit_data['type'] == 'receipt'){
+                if(!empty($submit_data['subscriber_id'])){
+                    $member_detail = $this->db->where('member_id',$submit_data['subscriber_id'])->get('tbl_members')->row_array();
+                    $account_name = $member_detail['name'];
+                }
+                if($submit_data['transaction_for'] == 'pay_emi'){
+                    $c_code = '116';
+                    $category_desc = 'Subscription Received ';
+                }else{
+                     $c_code = '116';
+                    $category_desc = 'Chit Handover Received ';
+                }
+               
+                $data = array(
+                    'insert_id'=> $insert_id,
+                    'c_code' => isset($c_code) ? $c_code :'',
+                    'category_desc' => isset($category_desc) ? $category_desc :'0',
+                    'transaction_mode' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                    'transaction_type' => isset($submit_data['transaction_type']) ? $submit_data['transaction_type'] :'',
+                    'transaction_description' => isset($submit_data['transaction_for']) ? $submit_data['transaction_for'] :'',
+                    'amount' => isset($submit_data['transaction_amount']) ? $submit_data['transaction_amount'] :'',
+                    'Dr/Cr' =>'Dr',
+                    'sub_id' => isset($submit_data['subscriber_id']) ? $submit_data['subscriber_id'] :'',
+                    'account_name' => isset($account_name) ? $account_name : '',
+                    'added_date' => date('Y-m-d h:i:s'),
+                    'account_description' => isset($account_description) ? $account_description :'',
+                    'gl_account' => '1002',
+                    'type' => 'Payment',
+                );
+                 $insert_data =  $this->db->insert('tbl_general_ledger_master',$data);
+                 $insert_id = $this->db->insert_id();
+                 $selest_ensert_id = $this->db->where('general_ledger_master_id',$insert_id)->get('tbl_general_ledger_master')->row_array();
+                  $data2 = array(
+                    'insert_id'=> $selest_ensert_id['insert_id'],
+                    'c_code' => isset($c_code) ? $c_code :'',
+                    'category_desc' => isset($category_desc) ? $category_desc :'0',
+                    'transaction_mode' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                    'transaction_type' => isset($submit_data['transaction_type']) ? $submit_data['transaction_type'] :'',
+                    'transaction_description' => isset($submit_data['transaction_for']) ? $submit_data['transaction_for'] :'',
+                    'amount' => isset($submit_data['transaction_amount']) ? $submit_data['transaction_amount'] :'',
+                    'Dr/Cr' =>'Cr',
+                    'sub_id' => isset($submit_data['subscriber_id']) ? $submit_data['subscriber_id'] :'',
+                    'account_name' => isset($account_name) ? $account_name : '',
+                    'added_date' => date('Y-m-d h:i:s'),
+                    'account_description' => 'Subscribers A/c',
+                    'gl_account' => '1002',
+                    'type' => 'Payment',
+                );
+                $this->db->insert('tbl_general_ledger_master',$data2);
+            }else{
+                    if(!empty($submit_data['subscriber_id'])){
+                        $member_detail = $this->db->where('member_id',$submit_data['subscriber_id'])->get('tbl_members')->row_array();
+                        $account_name = $member_detail['name'];
+                    }
+                    $data = array(
+                        'insert_id'=> $insert_id,
+                        'c_code' => isset($employee_code) ? $employee_code :'0',
+                        'transaction_mode' =>isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'transaction_type' => isset($submit_data['transaction_type']) ? $submit_data['transaction_type'] :'',
+                        'transaction_description' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'amount' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'Dr/Cr' =>'Cr',
+                        'sub_id' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'account_name' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'added_date' => date('Y-m-d h:i:s'),
+                        'account_description' => 'Subscribers A/c',
+                        'gl_account' => '1002',
+                        'type' => 'Receipt',
+                    );
+                     $insert_data =  $this->db->insert('tbl_general_ledger_master',$data);
+                     $insert_id = $this->db->insert_id();
+                     
+                     $selest_ensert_id = $this->db->where('general_ledger_master_id',$insert_id)->get('tbl_general_ledger_master')->row_array();
+                      $data2 = array(
+                        'insert_id'=> $selest_ensert_id['insert_id'],
+                        'c_code' => isset($employee_code) ? $employee_code :'0',
+                        'transaction_mode' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'transaction_type' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'transaction_description' => isset($account_description) ? $account_description :'',
+                        'amount' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'Dr/Cr' =>'Dr',
+                        'sub_id' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'account_name' => isset($bank_detail['bank_name']) ? $bank_detail['bank_name'] :'',
+                        'added_date' => date('Y-m-d h:i:s'),
+                        'account_description' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'gl_account' => isset($submit_data['payment_mode']) ? $submit_data['payment_mode'] :'',
+                        'type' => 'Receipt',
+                    );
+                $this->db->insert('tbl_general_ledger_master',$data2);
+            }
+		}
     
     
     
