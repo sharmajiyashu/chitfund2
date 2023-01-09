@@ -1147,6 +1147,9 @@ class Dashboard extends CI_Controller {
     }
    
     public function importSubscription(){
+
+
+       
          // Check form submit or not 
         if(!empty($_FILES['file']['name'])){ 
          // Set preference 
@@ -1160,6 +1163,7 @@ class Dashboard extends CI_Controller {
          $this->load->library('upload',$config); 
  
          // File upload
+         
          if($this->upload->do_upload('file')){ 
             // Get data about the file
             $uploadData = $this->upload->data(); 
@@ -1170,12 +1174,11 @@ class Dashboard extends CI_Controller {
             $file = fopen("images/".$filename,"r");
             $i = 0;
             
-            $numberOfFields = 21; // Total number of fields
+            $numberOfFields = 25; // Total number of fields
             $importData_arr = array();
  
             while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                $num = count($filedata );
-                
                if($numberOfFields == $num){
                   for ($c=0; $c < $num; $c++) {
                      $importData_arr[$i][] = $filedata [$c];
@@ -1193,21 +1196,26 @@ class Dashboard extends CI_Controller {
                // Skip first row
                if($skip != 0){
                 
-                 $data = array(
-                     "plan_name" => isset($userdata[1]) ? $userdata[1] : '',
-                     "admission_fee" => isset($userdata[2]) ? $userdata[2]: '',
-                     "plan_amount" => isset($userdata[3]) ? $userdata[3] : '',
-                     "tenure" => isset($userdata[4]) ? $userdata[4] : '',
-                     "start_month" => isset($userdata[5]) ? $userdata[5] : '',
-                     "agent_commission" => isset($userdata[6]) ? $userdata[6] : '',
-                     "emi" => isset($userdata[7]) ? $userdata[7] : '',
-                     "total_months" => isset($userdata[8]) ? $userdata[8] : '',
-                     "groups_counts" => isset($userdata[11]) ? $userdata[11] : '',
-                     "end_date_for_subscription" => isset($userdata[12]) ? $userdata[12] : '',
-                     "foreman_fees" => isset($userdata[13]) ? $userdata[13] : '',
-                     "min_prize_amount" => isset($userdata[14]) ? $userdata[14] : '',
-                     "max_bid" => isset($userdata[15]) ? $userdata[15] : '',
-                    );  
+                $data = array(
+                    'plan_name' =>   isset($userdata[1]) ? $userdata[1] : '',
+                    'admission_fee' =>   isset($userdata[2]) ? $userdata[2] : '',
+                    'plan_amount' =>   isset($userdata[4]) ? $userdata[4] : '',
+                    'tenure' =>   isset($userdata[5]) ? $userdata[5] : '',
+                    'start_month' =>   isset($userdata[6]) ? $userdata[6] : '',
+                    'agent_commission' =>   isset($userdata[7]) ? $userdata[7] : '',
+                    'emi' =>   isset($userdata[8]) ? $userdata[8] : '',
+                    'foreman_fees' =>   isset($userdata[14]) ? $userdata[14] : '',
+                    'min_prize_amount' =>   isset($userdata[15]) ? $userdata[15] : '',
+                    'total_subscription' =>   isset($userdata[9]) ? $userdata[9] : '',
+                    'months_completed' =>   isset($userdata[10]) ? $userdata[10] : '',
+                    'total_months' =>   isset($userdata[11]) ? $userdata[11] : '',
+                    'groups_counts' =>   isset($userdata[12]) ? $userdata[12] : '',
+                    'end_date_for_subscription' =>   isset($userdata[13]) ? $userdata[13] : '',
+                    'max_bid' =>   isset($userdata[16]) ? $userdata[16] : '',
+                    'auction_type' =>   isset($userdata[21]) ? $userdata[21] : '',
+                    'variable_auction_percentage' =>   isset($userdata[22]) ? $userdata[22] : '',
+                    'plan_gst' =>   isset($userdata[19]) ? $userdata[19] : '',
+                   );
                     $res = Json_decode(callAPI('POST','addPlan',$data));
                }
                $skip ++;
@@ -2192,12 +2200,11 @@ public function exportDivident(){
             // Reading file
             $file = fopen("images/".$filename,"r");
             $i = 0;
-            $numberOfFields = 26; // Total number of fields
+            $numberOfFields = 29; // Total number of fields
             $importData_arr = array();
  
             while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                $num = count($filedata );
-                
                if($numberOfFields == $num){
                   for ($c=0; $c < $num; $c++) {
                      $importData_arr[$i][] = $filedata [$c];
@@ -2222,6 +2229,7 @@ public function exportDivident(){
                      "member_name"  => isset($userdata[17]) ? $userdata[17] : '',
                      "payment_mode"  => isset($userdata[21]) ? $userdata[21] : '',
                     ); 
+                    
                 $getbidsforauction=json_decode(callAPI('POST','BuyPlanByAgent',$header),true); 
                 }
                }

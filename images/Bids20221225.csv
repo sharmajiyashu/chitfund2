@@ -1,6 +1,0 @@
-bid_id,plan_id,auction_id,member_id,group_id,agent_id,plan_name,member_name,bid_amount,forgo_amount,divident,cost_of_chit_taken,risk_factor,slot_number,is_bid_accepted,is_added_by_agent,added_date,update_date,added_by,update_by
-1,6,3,8,9,0,"Gold Plan","testing 8",65000,35000,,0.18571428571429,NULL,102201L604,yes,NULL,"2022-10-14 11:40:03","0000-00-00 00:00:00",0,0
-2,6,4,6,9,0,"Gold Plan","testing 6",65000,35000,,0.20634920634921,NULL,102201L606,yes,NULL,"2022-10-14 11:42:38","0000-00-00 00:00:00",0,0
-3,6,5,1,9,0,"Gold Plan","testing 1",88000,12000,,0.91666666666667,NULL,102201L609,yes,NULL,"2022-10-14 11:59:09","0000-00-00 00:00:00",0,0
-4,6,6,10,9,0,"Gold Plan","testing 10",80000,20000,,0.5,NULL,102201L602,yes,NULL,"2022-11-18 12:52:56","0000-00-00 00:00:00",0,0
-5,7,8,11,11,0,"DEC '2022",11,980000,20000,,4.9,NULL,122210L701,yes,NULL,"2022-12-14 17:04:55","0000-00-00 00:00:00",0,0
