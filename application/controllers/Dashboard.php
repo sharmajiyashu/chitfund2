@@ -1714,6 +1714,93 @@ public function importTransaction(){
  $this->session->set_flashdata('Success', 'Import Successfully');
  redirect('Dashboard/ImportExport');
 }
+
+public function OtherImport(){
+
+    
+    // Check form submit or not 
+   if(!empty($_FILES['file']['name'])){ 
+    // Set preference 
+   
+    $config['upload_path'] = 'images/'; 
+    $config['allowed_types'] = 'csv'; 
+    $config['max_size'] = '10000'; // max_size in kb 
+    $config['file_name'] = $_FILES['file']['name'];
+
+    // Load upload library 
+    $this->load->library('upload',$config); 
+
+    // File upload
+    if($this->upload->do_upload('file')){ 
+       // Get data about the file
+       $uploadData = $this->upload->data(); 
+
+       $filename = $uploadData['file_name'];
+
+       // Reading file
+       $file = fopen("images/".$filename,"r");
+       $i = 0;
+       
+       $numberOfFields = 27; // Total number of fields
+       $importData_arr = array();
+
+       while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+          $num = count($filedata );
+        //   print_r($num);die;
+          if($numberOfFields == $num){
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+          }
+          $i++;
+       }
+       fclose($file);
+
+       $skip = 0;
+       
+       $all_data = array();
+       
+       // insert import data
+       foreach($importData_arr as $userdata){
+        // echo "<pre>";  
+          // Skip first row
+          if($skip != 0){
+
+            $member_detail = $this->db->where('agent_id',$userdata[3])->get('tbl_members')->row_array();
+            $member_name = isset($member_detail['name']) ? $member_detail['name'] : '';
+            
+
+            $plan_detail = $this->db->where('plan_name',$userdata[2])->get('tbl_plans')->row_array();
+            
+            // print_r($plan_detail);die;
+            $data = array(
+                'member_id' =>   isset($member_detail['member_id']) ?  $member_detail['member_id'] : '',
+                'plan_id' =>   isset($plan_detail['plan_id']) ?  $plan_detail['plan_id'] : '',
+                'payment_mode' =>   '',
+                'member_name' => isset($member_name) ?  $member_name : '',
+            ); 
+            // print_r($data);die;
+            $res=json_decode(callAPI('POST','BuyPlanByAgent',$data),true);  
+          }
+          $skip ++;
+       }
+       $data['response'] = 'successfully uploaded '.$filename; 
+    }else{ 
+       $data['response'] = 'failed'; 
+    } 
+ }else{ 
+    $data['response'] = 'failed'; 
+ } 
+ $this->session->set_flashdata('Success', 'Import Successfully');
+ redirect('Dashboard/ImportExport');
+}
+
+
+public function getTestOrders(){
+    $dt = $this->db->where('member_id','0')->get('tbl_orders')->row_array();
+    echo "<pre>";
+    print_r($dt);die;
+}
   
     public function exportSubscriber(){
       $file_name = 'Subscriber'.date('Ymd').'.csv'; 

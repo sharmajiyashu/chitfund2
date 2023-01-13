@@ -115,6 +115,14 @@
                                             <a href="<?php echo base_url(); ?>Dashboard/exportDivident"><button class="btn btn-primary">Export</button></a>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-12">                      
+                                        <div class="form-group">
+                                            <label>Other import*</label>
+                                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#OtherImport" style="margin-left: 7%;">Import</a>
+                                            <a href="<?php echo base_url(); ?>Dashboard/exportDivident"><button class="btn btn-primary">Export</button></a>
+                                        </div>
+                                    </div>
                                     
                                     
                                 </div>
@@ -296,6 +304,32 @@
                         <div class="popup text-left">
                             <h4 class="mb-3">Import</h4>
                             <form action="<?php echo base_url();?>Dashboard/importTransaction" method="post" enctype="multipart/form-data">
+                            <div class="content create-workform bg-body">
+                                <div class="pb-3">
+                                    <label class="mb-2">CSV</label>
+                                    <input type="file" name="file" class="form-control" placeholder="Enter CSV"style="height: 65px;">
+                                </div>
+                                <div class="col-lg-12 mt-4">
+                                    <div class="d-flex flex-wrap align-items-ceter justify-content-center">
+                                        <div class="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
+                                        <div><button name="submit" type="submit" class="btn-primary" value="Upload" style="border-radius: 9px;width: 112%;height: 102%;">Submit</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="OtherImport" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="popup text-left">
+                            <h4 class="mb-3">Import</h4>
+                            <form action="<?php echo base_url();?>Dashboard/OtherImport" method="post" enctype="multipart/form-data">
                             <div class="content create-workform bg-body">
                                 <div class="pb-3">
                                     <label class="mb-2">CSV</label>
