@@ -1741,7 +1741,7 @@ public function OtherImport(){
        $file = fopen("images/".$filename,"r");
        $i = 0;
        
-       $numberOfFields = 27; // Total number of fields
+       $numberOfFields = 15; // Total number of fields
        $importData_arr = array();
 
        while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
@@ -1761,26 +1761,51 @@ public function OtherImport(){
        $all_data = array();
        
        // insert import data
+       echo "<pre>";
        foreach($importData_arr as $userdata){
-        // echo "<pre>";  
-          // Skip first row
-          if($skip != 0){
+          if($skip != 0){     
+            
+            $slot_id = isset($userdata['2']) ? $userdata['2'] :'';
+            if(!empty($slot_id)){
 
-            $member_detail = $this->db->where('agent_id',$userdata[3])->get('tbl_members')->row_array();
-            $member_name = isset($member_detail['name']) ? $member_detail['name'] : '';
+
+                $orders_detail = $this->db->where('slot_number',$slot_id)->get('tbl_orders')->row_array();
+                if(!empty($orders_detail)){
+                    $plan_data = $this->db->where('plan_id',$orders_detail['plan_id'])->get('tbl_plans')->row_array();
+                    $member_detail = $this->db->where('member_id',$orders_detail['member_id'])->get('tbl_members')->row_array();
+                    // print_r($member_detail);die;
+                    
+                    $plan_less_f = $plan_data['plan_amount'] - $userdata['4'];
+                    $newDate = date("M,Y", strtotime($userdata['8']));  
+                    $data = array(
+                        'plan_id' => isset($orders_detail['plan_id']) ? $orders_detail['plan_id'] :'',
+                        'auction_id' => isset($auction_id) ? $auction_id :'',
+                        'member_id' => isset($orders_detail['member_id']) ? $orders_detail['member_id'] : '0',
+                        'group_id' => isset($orders_detail['group_id']) ? $orders_detail['group_id'] :'',
+                        'agent_id' => '0',
+                        'plan_name' => isset($plan_data['plan_name']) ? $plan_data['plan_name'] : '',
+                        'member_name' => isset($member_detail['name']) ? $member_detail['name'] : '',
+                        'bid_amount' => isset($plan_less_f) ? $plan_less_f : '',
+                        'forgo_amount' => isset($userdata['4']) ? $userdata['4'] :'',
+                        'divident' => '',
+                        'cost_of_chit_taken' => isset($cost_of_chit_taken) ? $cost_of_chit_taken :'',
+                        'slot_number' => isset($slot_id) ? $slot_id :'',
+                        'added_date' => $newDate,
+                        );
+        
+                        // print_r($data);die;
+                        if(!empty($slot_id)){
+                            $insertdata = $this->db->insert('tbl_bids',$data);
+                        }
+                }
+           
             
 
-            $plan_detail = $this->db->where('plan_name',$userdata[2])->get('tbl_plans')->row_array();
+            }
+                
+
             
-            // print_r($plan_detail);die;
-            $data = array(
-                'member_id' =>   isset($member_detail['member_id']) ?  $member_detail['member_id'] : '',
-                'plan_id' =>   isset($plan_detail['plan_id']) ?  $plan_detail['plan_id'] : '',
-                'payment_mode' =>   '',
-                'member_name' => isset($member_name) ?  $member_name : '',
-            ); 
-            // print_r($data);die;
-            $res=json_decode(callAPI('POST','BuyPlanByAgent',$data),true);  
+            
           }
           $skip ++;
        }
@@ -2292,6 +2317,7 @@ public function exportDivident(){
  
             while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                $num = count($filedata );
+               print_r($num);die;
                if($numberOfFields == $num){
                   for ($c=0; $c < $num; $c++) {
                      $importData_arr[$i][] = $filedata [$c];
@@ -2318,6 +2344,7 @@ public function exportDivident(){
                     ); 
                     
                 $getbidsforauction=json_decode(callAPI('POST','BuyPlanByAgent',$header),true); 
+
                 }
                }
                $skip ++;
